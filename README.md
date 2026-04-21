@@ -1,5 +1,7 @@
 # dotfiles
 
+[![ci](https://github.com/anshulverma/dotfiles/actions/workflows/ci.yml/badge.svg)](https://github.com/anshulverma/dotfiles/actions/workflows/ci.yml)
+
 Personal dotfiles for macOS, Ubuntu/Debian, and GitHub Codespaces.
 
 ## Install
@@ -48,13 +50,27 @@ Keep secrets and host-specific config out of this repo:
 
 - `~/.zshrc.local` — sourced at the end of `.zshrc` if present.
 - `~/.gitconfig.local` — included at the end of `.gitconfig` (work email,
-  signing key, etc.).
+  signing key, `gh auth setup-git` credential helper blocks, etc.).
 
 ## GitHub Codespaces
 
 In your personal Codespaces settings, enable "Dotfiles" and point it at
 this repo. Codespaces clones it and runs `install.sh` automatically for
 every new codespace.
+
+## CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push,
+every PR, and once a week (Sunday 08:00 UTC — catches upstream apt/brew/tmux
+rot even when the repo is idle):
+
+- **lint** — `bash -n install.sh` and `zsh -n` the zsh configs.
+- **install-ubuntu** — runs the full `install.sh`, verifies all expected
+  symlinks exist, smoke-tests zsh + tmux + git, then re-runs with
+  `--link-only` to check idempotency.
+- **install-macos** — same end-to-end install on `macos-latest`.
+- **install-codespaces** — sets `CODESPACES=true` on Ubuntu and verifies
+  the installer flips the login shell to zsh via `sudo chsh`.
 
 ## Uninstall / rollback
 
