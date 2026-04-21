@@ -40,6 +40,7 @@ Post-install:
 | `readline/.inputrc`    | `~/.inputrc`                       | emacs mode, history-search on arrows                         |
 | `gradle/gradle.properties` | `~/.gradle/gradle.properties`  | enables gradle daemon                                        |
 | `iterm2/com.googlecode.iterm2.plist` | (macOS `defaults import`) | iTerm2 preferences                                   |
+| `bin/scripts/`, `bin/applescripts/` | (added to `PATH` by `.zshenv`) | personal scripts; see `bin/README.md`             |
 
 ## Per-machine overrides
 

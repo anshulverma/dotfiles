@@ -17,6 +17,7 @@ Each top-level directory corresponds to one tool; the files inside are symlinked
 - `readline/.inputrc` — readline config (emacs mode, history-search on arrows and C-p/C-n).
 - `iterm2/com.googlecode.iterm2.plist` — iTerm2 preferences. `install.sh` runs `defaults import` for this only on macOS.
 - `gradle/gradle.properties` — symlinked to `~/.gradle/gradle.properties`.
+- `bin/` — personal scripts merged in via `git subtree` from a separate repo (history preserved). `bin/scripts/` and `bin/applescripts/` are added to `$PATH` by `zsh/.zshenv`; don't add a separate install step for these.
 
 ## Things that are easy to get wrong
 
@@ -27,3 +28,4 @@ Each top-level directory corresponds to one tool; the files inside are symlinked
 - `install.sh` is idempotent: existing real files at destinations get moved to `<path>.backup.<timestamp>`; existing symlinks are replaced silently. When debugging an install, look for `*.backup.*` files before assuming config was lost.
 - Homebrew path differs by arch: `/opt/homebrew/bin/brew` on Apple Silicon, `/usr/local/bin/brew` on Intel. `.zshrc` and `install.sh` check both — do not hardcode one.
 - `install.sh` deliberately does not run `chsh`. The post-install message tells the user to run it themselves; changing the login shell often needs a password and fails silently in CI/Codespaces.
+- `zsh/.zshenv` derives the repo path from its own symlink via `${${(%):-%N}:A:h:h}` so `bin/scripts` gets on `PATH` regardless of where the repo is checked out. If you change the directory depth of `.zshenv` within the repo, update the number of `:h` strips.
