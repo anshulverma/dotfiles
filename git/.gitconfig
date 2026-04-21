@@ -49,6 +49,9 @@
 	unstage = reset HEAD --
 	uncommit = reset --soft HEAD~1
 
-# Per-machine overrides (work email, signing key) belong in ~/.gitconfig.local.
+# Per-machine overrides (work email, signing key, credential helpers) belong
+# in ~/.gitconfig.local. `gh auth setup-git` wants to write credential.helper
+# blocks into the file ~/.gitconfig resolves to — keep them in the override
+# file so they don't end up in the repo.
 [include]
 	path = ~/.gitconfig.local
