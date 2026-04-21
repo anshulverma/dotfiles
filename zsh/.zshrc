@@ -28,11 +28,13 @@ setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 
 # -- completion ----------------------------------------------------------------
 autoload -Uz compinit
-# Speed up compinit by only security-checking the dump once a day.
+# -u: use completions from insecure dirs without prompting (fresh Ubuntu /usr/share/zsh
+#     often has group-writable dirs that would otherwise prompt at every login).
+# Rebuild the dump at most once a day.
 if [[ -n $(find "${ZDOTDIR:-$HOME}/.zcompdump"(Nmh+24) 2>/dev/null) ]]; then
-  compinit
+  compinit -u
 else
-  compinit -C
+  compinit -C -u
 fi
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+l:|=* r:|=*'
