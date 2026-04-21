@@ -77,6 +77,22 @@ install_tpm() {
   git clone --depth 1 https://github.com/tmux-plugins/tpm "$tpm_dir"
 }
 
+# In Codespaces, also bootstrap the sibling repos we rely on. Keeps one
+# dotfiles entry point responsible for turning a fresh codespace into a
+# usable environment.
+clone_and_install_emacs() {
+  is_codespaces || return 0
+  local dest="$HOME/workspace/emacs"
+  if [[ ! -d "$dest/.git" ]]; then
+    log "Cloning anshulverma/emacs -> $dest"
+    mkdir -p "$(dirname "$dest")"
+    git clone https://github.com/anshulverma/emacs.git "$dest"
+  else
+    log "emacs repo already present at $dest"
+  fi
+  ( cd "$dest" && ./install.sh ) || warn "emacs install.sh failed; continuing"
+}
+
 link_file() {
   local src="$1" dst="$2"
   if [[ ! -e "$src" ]]; then
@@ -149,6 +165,7 @@ main() {
 
   if [[ $LINK_ONLY -eq 0 ]]; then
     switch_login_shell_codespaces
+    clone_and_install_emacs
   fi
 
   cat <<EOF
