@@ -2,3 +2,6 @@
 
 # library files
 /tmux/plugins
+
+# claude code local settings
+/.claude/settings.local.json
