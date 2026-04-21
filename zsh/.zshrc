@@ -75,6 +75,42 @@ alias gl='git log --oneline --graph --decorate -20'
 alias gco='git checkout'
 alias gcb='git checkout -b'
 
+# -- safety nets ---------------------------------------------------------------
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rmf='rm -f'
+alias cpf='cp -f'
+alias mvf='mv -f'
+alias mkdir='mkdir -p'
+
+# -- shortcuts -----------------------------------------------------------------
+alias h='history'
+alias j='jobs -l'
+alias du='du -kh'
+alias df='df -kTh 2>/dev/null || df -kh'
+
+# -- tmux ----------------------------------------------------------------------
+alias tmuxa='tmux -2 a'
+tmw() { tmux split-window -dh "$*"; }   # run a command in a new split
+
+# -- docker --------------------------------------------------------------------
+alias docker-rm-all='docker rm $(docker ps -a -q)'
+alias docker-kill-all='docker kill $(docker ps -a -q)'
+docker-exec()    { docker exec -it "$(docker_container_id "$1")" bash; }
+docker-kill()    { docker kill      "$(docker_container_id "$1")"; }
+docker-inspect() { docker inspect   "$(docker_container_id "$1")"; }
+docker-ip()      { docker inspect -f '{{.NetworkSettings.IPAddress}}' "$@"; }
+
+# -- misc ----------------------------------------------------------------------
+httph() { curl -iksD - "$1" -o /dev/null; }  # dump headers for a URL
+
+# macOS-only helpers
+if [[ -n "${IS_MAC:-}" ]]; then
+  alias sleep-computer='osascript -e "tell application \"Finder\" to sleep"'
+  chrome() { open -a 'Google Chrome' "${1:-https://google.com}"; }
+fi
+
 # -- local overrides -----------------------------------------------------------
 # Per-machine settings (secrets, work-specific aliases) go in ~/.zshrc.local.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
