@@ -1,0 +1,119 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Weekly rot check — catches upstream package / syntax changes even
+    # when nothing has been committed.
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: lint (bash + zsh syntax)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install zsh
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq zsh
+      - name: bash -n install.sh
+        run: bash -n install.sh
+      - name: zsh -n zsh configs
+        run: |
+          zsh -n zsh/.zshrc
+          zsh -n zsh/.zshenv
+
+  install-ubuntu:
+    name: install on ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: run installer
+        run: ./install.sh
+      - name: verify symlinks
+        run: |
+          set -e
+          expected=(
+            .zshrc .zshenv .gitconfig .gitignore_global .vimrc
+            .tmux.conf .tmux.conf.local .inputrc
+          )
+          for f in "${expected[@]}"; do
+            if [[ ! -L "$HOME/$f" ]]; then
+              echo "missing symlink: $HOME/$f" >&2
+              exit 1
+            fi
+          done
+      - name: smoke test zsh
+        run: |
+          zsh -i -c '
+            set -e
+            command -v flip >/dev/null
+            command -v docker_container_id >/dev/null
+            [[ "$EDITOR" == vim ]]
+          '
+      - name: smoke test tmux
+        run: |
+          tmux -f ~/.tmux.conf new-session -d -s ci-test
+          tmux kill-session -t ci-test
+      - name: smoke test git
+        run: |
+          [[ "$(git config --get user.email)" == "anshul.verma86@gmail.com" ]]
+          [[ "$(git config --get alias.lg)" == "log --oneline --graph --decorate --all" ]]
+      - name: idempotency — re-run should not fail
+        run: ./install.sh --link-only
+
+  install-macos:
+    name: install on macos-latest
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: run installer
+        run: ./install.sh
+      - name: verify symlinks
+        run: |
+          set -e
+          expected=(
+            .zshrc .zshenv .gitconfig .gitignore_global .vimrc
+            .tmux.conf .tmux.conf.local .inputrc
+          )
+          for f in "${expected[@]}"; do
+            if [[ ! -L "$HOME/$f" ]]; then
+              echo "missing symlink: $HOME/$f" >&2
+              exit 1
+            fi
+          done
+      - name: smoke test zsh
+        run: |
+          set -e
+          zsh -i -c '
+            set -e
+            command -v flip >/dev/null
+            [[ "$EDITOR" == vim ]]
+          '
+      - name: smoke test tmux
+        run: |
+          tmux -f ~/.tmux.conf new-session -d -s ci-test
+          tmux kill-session -t ci-test
+
+  install-codespaces:
+    name: install on ubuntu with CODESPACES=true
+    runs-on: ubuntu-latest
+    env:
+      CODESPACES: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: run installer
+        run: ./install.sh
+      - name: verify login shell was switched to zsh
+        run: |
+          shell="$(getent passwd "$USER" | cut -d: -f7)"
+          echo "login shell: $shell"
+          case "$shell" in
+            *zsh) ;;
+            *) echo "expected zsh, got $shell" >&2; exit 1 ;;
+          esac
+      - name: smoke test zsh
+        run: |
+          zsh -i -c 'command -v flip >/dev/null && [[ "$EDITOR" == vim ]]'
