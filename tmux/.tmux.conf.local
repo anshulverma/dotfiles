@@ -271,13 +271,14 @@ set-option -g allow-rename off
 setw -g mode-keys emacs
 
 ### Session initialization
-new -s avee -n status htop
-splitw -h -p 10 -t 1 watch uptime
-splitw -v -p 50 -t 2 watch df -h
-selectp -t 1
-neww -n emacs emacsclient -nw
-neww -n workspace
-selectw -t 3
+# Personal layout; requires htop and emacsclient. Uncomment to enable.
+# new -s avee -n status htop
+# splitw -h -p 10 -t 1 watch uptime
+# splitw -v -p 50 -t 2 watch df -h
+# selectp -t 1
+# neww -n emacs emacsclient -nw
+# neww -n workspace
+# selectw -t 3
 
 # enable activity alerts
 setw -g monitor-activity on
@@ -358,10 +359,7 @@ set -g status-interval 1
 set -g status-justify left # center align window list
 
 # default statusbar colors
-set -g status-fg white
-set -g status-bg default
+set -g status-style "bg=default,fg=white"
 
 # bell colours
-set -g window-status-bell-bg default
-set -g window-status-bell-fg red
-set -g window-status-bell-attr bright
+set -g window-status-bell-style "bg=default,fg=red,bright"

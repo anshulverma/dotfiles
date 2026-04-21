@@ -1,9 +1,11 @@
-Based on tmux configuration by gpakosz located [here](https://github.com/gpakosz/.tmux).
+Based on the tmux configuration by gpakosz: https://github.com/gpakosz/.tmux
 
-### Installation
+Install via the repo-root `install.sh`, which symlinks `.tmux.conf` and
+`.tmux.conf.local` into `$HOME` and clones TPM into `~/.tmux/plugins/tpm`.
 
-We must install version `2.3` to make sure all plugins work.
+After starting tmux for the first time, install the plugins with:
 
-``` shell
-brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/9888d2c213/Formula/tmux.rb --with-utf8proc
-```
+    prefix + I    (i.e. C-q I)
+
+Personal customizations (prefix `C-q`, pane bindings, etc.) live in
+`.tmux.conf.local` under the `-- user customizations --` section.
