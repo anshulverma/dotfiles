@@ -1,0 +1,54 @@
+[user]
+	name = Anshul Verma
+	email = anshul.verma86@gmail.com
+
+[core]
+	editor = vim
+	autocrlf = input
+	excludesfile = ~/.gitignore_global
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[rebase]
+	autoStash = true
+
+[merge]
+	conflictStyle = zdiff3
+
+[diff]
+	colorMoved = zebra
+	algorithm = histogram
+
+[color]
+	ui = auto
+
+[rerere]
+	enabled = true
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	ci = commit
+	cia = commit --amend
+	df = diff
+	dc = diff --cached
+	lg = log --oneline --graph --decorate --all
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	uncommit = reset --soft HEAD~1
+
+# Per-machine overrides (work email, signing key) belong in ~/.gitconfig.local.
+[include]
+	path = ~/.gitconfig.local
