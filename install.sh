@@ -115,6 +115,18 @@ import_iterm2_prefs() {
   defaults import com.googlecode.iterm2 "$plist"
 }
 
+# Codespaces grants password-less sudo, so we can switch the login shell
+# without prompting. On other systems we just print instructions.
+switch_login_shell_codespaces() {
+  is_codespaces || return 0
+  local zsh_bin
+  zsh_bin="$(command -v zsh || true)"
+  [[ -n "$zsh_bin" ]] || return 0
+  case "${SHELL:-}" in *zsh) return 0 ;; esac
+  log "Setting zsh as login shell (Codespaces)"
+  sudo chsh -s "$zsh_bin" "${USER:-$(id -un)}" || warn "chsh failed; set shell manually"
+}
+
 main() {
   local os
   os="$(detect_os)"
@@ -133,6 +145,10 @@ main() {
 
   if [[ "$os" == macos && $LINK_ONLY -eq 0 ]]; then
     import_iterm2_prefs
+  fi
+
+  if [[ $LINK_ONLY -eq 0 ]]; then
+    switch_login_shell_codespaces
   fi
 
   cat <<EOF
