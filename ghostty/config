@@ -20,6 +20,11 @@ shell-integration-features = cursor,sudo,title
 # Prefix is C-q in tmux — Ghostty doesn't grab it by default, leaving this
 # note here so future-you doesn't rebind ctrl+q to something app-level.
 
+# Tab switching with cmd+arrows (in addition to Ghostty's default
+# cmd+shift+[ / cmd+shift+]).
+keybind = super+right=next_tab
+keybind = super+left=previous_tab
+
 # Optional per-machine overrides (theme, font-family, work-only tweaks).
 # The leading `?` makes the file optional — absence is not an error.
 config-file = ?~/.config/ghostty/config.local
