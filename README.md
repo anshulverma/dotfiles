@@ -41,7 +41,7 @@ Post-install:
 | `tmux/.tmux.conf.local`| `~/.tmux.conf.local`               | personal bindings — prefix is `C-q`                          |
 | `readline/.inputrc`    | `~/.inputrc`                       | emacs mode, history-search on arrows                         |
 | `gradle/gradle.properties` | `~/.gradle/gradle.properties`  | enables gradle daemon                                        |
-| `iterm2/com.googlecode.iterm2.plist` | (macOS `defaults import`) | iTerm2 preferences                                   |
+| `ghostty/config`       | `~/.config/ghostty/config`         | Ghostty terminal config; machine-specific overrides in `~/.config/ghostty/config.local` |
 | `bin/scripts/`, `bin/applescripts/` | (added to `PATH` by `.zshenv`) | personal scripts; see `bin/README.md`             |
 
 ## Per-machine overrides

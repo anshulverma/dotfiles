@@ -15,7 +15,7 @@ Each top-level directory corresponds to one tool; the files inside are symlinked
 - `vim/` — minimal `.vimrc`. Swap/backup/undo go under `~/.vim/` (auto-created).
 - `tmux/` — [gpakosz/.tmux](https://github.com/gpakosz/.tmux) distribution. `.tmux.conf` is the vendored upstream and should not be edited; personal bindings live in `.tmux.conf.local` under the `-- user customizations --` section (prefix `C-q`, pane bindings, etc.).
 - `readline/.inputrc` — readline config (emacs mode, history-search on arrows and C-p/C-n).
-- `iterm2/com.googlecode.iterm2.plist` — iTerm2 preferences. `install.sh` runs `defaults import` for this only on macOS.
+- `ghostty/config` — Ghostty terminal config, symlinked to `~/.config/ghostty/config`. Per-machine overrides go in `~/.config/ghostty/config.local` (Ghostty loads it via the `config-file = ?...` directive at the bottom of the main file).
 - `gradle/gradle.properties` — symlinked to `~/.gradle/gradle.properties`.
 - `bin/` — personal scripts merged in via `git subtree` from a separate repo (history preserved). `bin/scripts/` and `bin/applescripts/` are added to `$PATH` by `zsh/.zshenv`; don't add a separate install step for these.
 

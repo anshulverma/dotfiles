@@ -38,6 +38,7 @@ jobs:
           expected=(
             .zshrc .zshenv .gitconfig .gitignore_global .vimrc
             .tmux.conf .tmux.conf.local .inputrc
+            .config/ghostty/config
           )
           for f in "${expected[@]}"; do
             if [[ ! -L "$HOME/$f" ]]; then
@@ -77,6 +78,7 @@ jobs:
           expected=(
             .zshrc .zshenv .gitconfig .gitignore_global .vimrc
             .tmux.conf .tmux.conf.local .inputrc
+            .config/ghostty/config
           )
           for f in "${expected[@]}"; do
             if [[ ! -L "$HOME/$f" ]]; then

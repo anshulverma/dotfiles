@@ -1,0 +1,25 @@
+# Ghostty configuration.
+# Reference: https://ghostty.org/docs/config
+# Per-machine overrides go in ~/.config/ghostty/config.local (see bottom).
+
+font-size = 14
+
+# Breathing room around the grid.
+window-padding-x = 8
+window-padding-y = 8
+window-save-state = always
+
+# Option as Alt/Meta so emacs-style readline bindings (M-b, M-f, ...) work
+# in zsh on macOS. Matches the expectation from tmux/.tmux.conf.local.
+macos-option-as-alt = true
+
+# Auto-detects zsh/bash/fish and injects shell integration.
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+# Prefix is C-q in tmux — Ghostty doesn't grab it by default, leaving this
+# note here so future-you doesn't rebind ctrl+q to something app-level.
+
+# Optional per-machine overrides (theme, font-family, work-only tweaks).
+# The leading `?` makes the file optional — absence is not an error.
+config-file = ?~/.config/ghostty/config.local

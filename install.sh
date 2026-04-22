@@ -121,14 +121,7 @@ link_all() {
   link_file "$DOTFILES_DIR/tmux/.tmux.conf.local" "$HOME/.tmux.conf.local"
   link_file "$DOTFILES_DIR/readline/.inputrc"     "$HOME/.inputrc"
   link_file "$DOTFILES_DIR/gradle/gradle.properties" "$HOME/.gradle/gradle.properties"
-}
-
-import_iterm2_prefs() {
-  local plist="$DOTFILES_DIR/iterm2/com.googlecode.iterm2.plist"
-  [[ -f "$plist" ]] || return
-  if ! command -v defaults >/dev/null 2>&1; then return; fi
-  log "Importing iTerm2 preferences"
-  defaults import com.googlecode.iterm2 "$plist"
+  link_file "$DOTFILES_DIR/ghostty/config"        "$HOME/.config/ghostty/config"
 }
 
 # Codespaces grants password-less sudo, so we can switch the login shell
@@ -158,10 +151,6 @@ main() {
   fi
 
   link_all
-
-  if [[ "$os" == macos && $LINK_ONLY -eq 0 ]]; then
-    import_iterm2_prefs
-  fi
 
   if [[ $LINK_ONLY -eq 0 ]]; then
     switch_login_shell_codespaces
