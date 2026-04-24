@@ -240,7 +240,7 @@ tmux_conf_theme_clock_style='24'
 #   - false (default)
 # on macOS, this requires installing reattach-to-user-namespace, see README.md
 # on Linux, this requires xsel or xclip
-tmux_conf_copy_to_os_clipboard=false
+tmux_conf_copy_to_os_clipboard=true
 
 
 # -- user customizations -------------------------------------------------------
@@ -286,9 +286,17 @@ set -g visual-activity off
 
 ### mouse
 
-# Mouse mode
+# Mouse mode — off by default so the terminal (e.g. iPad Terminus) can do
+# native text selection. Toggle on with prefix+m when you want tmux-level
+# scroll/pane-resize; prefix+M turns it back off.
+set-option -g mouse off
 
-set-option -g mouse on
+# forward copies to the terminal's system clipboard via OSC 52
+set -g set-clipboard on
+
+# drag-select with the mouse copies the selection and exits copy mode
+bind-key -T copy-mode    MouseDragEnd1Pane send -X copy-selection-and-cancel
+bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection-and-cancel
 
 set -g @scroll-down-exit-copy-mode "off"
 set -g @scroll-without-changing-pane "on"
