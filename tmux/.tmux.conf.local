@@ -94,7 +94,7 @@ tmux_conf_theme_status_attr='none'
 tmux_conf_theme_window_status_fg='#8a8a8a'              # light gray
 tmux_conf_theme_window_status_bg='#080808'              # dark gray
 tmux_conf_theme_window_status_attr='none'
-tmux_conf_theme_window_status_format='#I #W'
+tmux_conf_theme_window_status_format='#I #W#{?window_activity_flag,•,}#{?window_bell_flag,!,}'
 #tmux_conf_theme_window_status_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_format='#I #W#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}'
 
@@ -104,24 +104,24 @@ tmux_conf_theme_window_status_format='#I #W'
 tmux_conf_theme_window_status_current_fg='#000000'      # black
 tmux_conf_theme_window_status_current_bg='#00afff'      # light blue
 tmux_conf_theme_window_status_current_attr='bold'
-tmux_conf_theme_window_status_current_format='#I #W'
+tmux_conf_theme_window_status_current_format='#I #W#{?window_zoomed_flag,🔍,}'
 #tmux_conf_theme_window_status_current_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_current_format='#I #W#{?window_zoomed_flag,🔍,}'
 
-# window activity status style
-tmux_conf_theme_window_status_activity_fg='default'
-tmux_conf_theme_window_status_activity_bg='default'
-tmux_conf_theme_window_status_activity_attr='underscore'
+# window activity status style — yellow bg fill so new output is unmissable
+tmux_conf_theme_window_status_activity_fg='#000000'     # black
+tmux_conf_theme_window_status_activity_bg='#ffd700'     # bright yellow
+tmux_conf_theme_window_status_activity_attr='bold'
 
-# window bell status style
-tmux_conf_theme_window_status_bell_fg='#ffff00'         # yellow
-tmux_conf_theme_window_status_bell_bg='default'
+# window bell status style — red bg + blink, "something is wrong" alarm
+tmux_conf_theme_window_status_bell_fg='#ffffff'         # white
+tmux_conf_theme_window_status_bell_bg='#d70000'         # red
 tmux_conf_theme_window_status_bell_attr='blink,bold'
 
-# window last status style
-tmux_conf_theme_window_status_last_fg='#00afff'         # light blue
-tmux_conf_theme_window_status_last_bg='default'
-tmux_conf_theme_window_status_last_attr='none'
+# window last (previously focused) — green fill, distinct hue from active blue
+tmux_conf_theme_window_status_last_fg='#000000'         # black
+tmux_conf_theme_window_status_last_bg='#87d75f'         # green
+tmux_conf_theme_window_status_last_attr='bold'
 
 # status left/right sections separators
 tmux_conf_theme_left_separator_main=''
@@ -360,14 +360,24 @@ bind-key E split-window "emacsclient -nw"
 
 ### status line
 
-set -g window-status-format "#I:#W"
-set -g window-status-current-format "#I:#W"
-
 set -g status-interval 1
-set -g status-justify left # center align window list
+set -g status-justify left # left align window list
 
-# default statusbar colors
-set -g status-style "bg=default,fg=white"
+# Window status styles applied directly. The tmux_conf_theme_* variables
+# above are only honoured when gpakosz's `_apply_configuration` runs to
+# completion; in practice `_apply_bindings` exits non-zero on this setup
+# (the "cut -c3- ~/.tmux.conf | sh -s _apply_configuration returned 2"
+# message), and `set -e` aborts the script before `_apply_theme` runs —
+# so the theme vars never make it to tmux. These set -g lines are the
+# operative ones.
+set -g window-status-style              "fg=#8a8a8a,bg=#080808,none"
+set -g window-status-current-style      "fg=#000000,bg=#00afff,bold"
+set -g window-status-activity-style     "fg=#000000,bg=#ffd700,bold"
+set -g window-status-bell-style         "fg=#ffffff,bg=#d70000,blink,bold"
+set -g window-status-last-style         "fg=#000000,bg=#87d75f,bold"
 
-# bell colours
-set -g window-status-bell-style "bg=default,fg=red,bright"
+# Markers ride alongside the bg colour because tmux style precedence
+# (bell > activity > last > base) means a "last" window with activity
+# would otherwise show only the activity yellow, hiding the green.
+set -g window-status-format         "#I #W#{?window_last_flag,«,}#{?window_activity_flag,•,}#{?window_bell_flag,!,}"
+set -g window-status-current-format "#I #W#{?window_zoomed_flag,🔍,}"
