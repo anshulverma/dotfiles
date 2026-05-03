@@ -94,7 +94,10 @@ tmux_conf_theme_status_attr='none'
 tmux_conf_theme_window_status_fg='#8a8a8a'              # light gray
 tmux_conf_theme_window_status_bg='#080808'              # dark gray
 tmux_conf_theme_window_status_attr='none'
-tmux_conf_theme_window_status_format='#I #W#{?window_activity_flag,•,}#{?window_bell_flag,!,}'
+# Markers ride alongside the bg colour because tmux style precedence
+# (bell > activity > last > base) means a "last" window with activity
+# would otherwise show only the activity yellow, hiding the green.
+tmux_conf_theme_window_status_format='#I #W#{?window_last_flag,«,}#{?window_activity_flag,•,}#{?window_bell_flag,!,}'
 #tmux_conf_theme_window_status_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_format='#I #W#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}'
 
@@ -298,6 +301,20 @@ set -g set-clipboard on
 bind-key -T copy-mode    MouseDragEnd1Pane send -X copy-selection-and-cancel
 bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection-and-cancel
 
+# Drop tmux's default right-click context menus. They contain `split-window`
+# inside deeply-nested `#{...}` menu items, which gpakosz's `_apply_bindings`
+# can't parse — its awk+sed quoting logic produces malformed shell, `eval`
+# hits a dash syntax error, and `set -e` aborts before `_apply_theme` runs
+# (the "cut -c3- ~/.tmux.conf | sh -s _apply_configuration returned 2"
+# message). Unbinding here, before the gpakosz post-processing runs, lets
+# the script exit cleanly. We don't use the right-click menus anyway.
+unbind-key -T root MouseDown3Pane
+unbind-key -T root MouseDown3Status
+unbind-key -T root MouseDown3StatusLeft
+unbind-key -T root M-MouseDown3Pane
+unbind-key -T root M-MouseDown3Status
+unbind-key -T root M-MouseDown3StatusLeft
+
 set -g @scroll-down-exit-copy-mode "off"
 set -g @scroll-without-changing-pane "on"
 set -g @scroll-in-moused-over-pane "on"
@@ -363,21 +380,11 @@ bind-key E split-window "emacsclient -nw"
 set -g status-interval 1
 set -g status-justify left # left align window list
 
-# Window status styles applied directly. The tmux_conf_theme_* variables
-# above are only honoured when gpakosz's `_apply_configuration` runs to
-# completion; in practice `_apply_bindings` exits non-zero on this setup
-# (the "cut -c3- ~/.tmux.conf | sh -s _apply_configuration returned 2"
-# message), and `set -e` aborts the script before `_apply_theme` runs —
-# so the theme vars never make it to tmux. These set -g lines are the
-# operative ones.
-set -g window-status-style              "fg=#8a8a8a,bg=#080808,none"
-set -g window-status-current-style      "fg=#000000,bg=#00afff,bold"
-set -g window-status-activity-style     "fg=#000000,bg=#ffd700,bold"
-set -g window-status-bell-style         "fg=#ffffff,bg=#d70000,blink,bold"
-set -g window-status-last-style         "fg=#000000,bg=#87d75f,bold"
-
-# Markers ride alongside the bg colour because tmux style precedence
-# (bell > activity > last > base) means a "last" window with activity
-# would otherwise show only the activity yellow, hiding the green.
-set -g window-status-format         "#I #W#{?window_last_flag,«,}#{?window_activity_flag,•,}#{?window_bell_flag,!,}"
-set -g window-status-current-format "#I #W#{?window_zoomed_flag,🔍,}"
+# gpakosz's `_apply_theme` wraps window-status-current-format with leading
+# and trailing #[...]separator markers (lines 794-798 of ~/.tmux.conf), even
+# when the separator chars themselves are empty — that still leaves visible
+# space padding around the current window. tmux 3.4 has no after-source-file
+# hook, so defer our unwrapped format via background run-shell with a tiny
+# sleep that lets `run 'cut -c3- ... _apply_configuration'` (line 166 of
+# ~/.tmux.conf) finish first.
+run -b "sleep 0.5 && tmux set -g window-status-current-format '##I ##W##{?window_zoomed_flag,🔍,}'"
