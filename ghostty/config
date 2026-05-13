@@ -2,6 +2,9 @@
 # Reference: https://ghostty.org/docs/config
 # Per-machine overrides go in ~/.config/ghostty/config.local (see bottom).
 
+theme = Everforest Dark Hard
+# theme = Dracula+
+# theme = Kanagawa Wave
 font-size = 14
 
 # Breathing room around the grid.
