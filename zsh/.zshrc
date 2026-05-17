@@ -96,6 +96,14 @@ alias df='df -kTh 2>/dev/null || df -kh'
 alias tmuxa='tmux -2 a'
 tmw() { tmux split-window -dh "$*"; }   # run a command in a new split
 
+# Auto-attach to tmux on SSH login when a session exists.
+# Guards: interactive shell, SSH login, not already inside tmux, tmux installed.
+if [[ $- == *i* ]] && [[ -n "${SSH_CONNECTION:-}" ]] && [[ -z "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1; then
+  if tmux list-sessions >/dev/null 2>&1; then
+    exec tmux -2 attach
+  fi
+fi
+
 # -- docker --------------------------------------------------------------------
 alias docker-rm-all='docker rm $(docker ps -a -q)'
 alias docker-kill-all='docker kill $(docker ps -a -q)'
