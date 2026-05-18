@@ -9,7 +9,7 @@ if [[ -z "${ZSH_DEBUG_STARTUP+x}" ]]; then
   fi
 fi
 
-export EDITOR="${EDITOR:-emacsclient -nw --alternate-editor=}"
+export EDITOR="emacsclient -nw --alternate-editor="
 export VISUAL="$EDITOR"
 export PAGER="${PAGER:-less}"
 export LESS='-R -i -M -x4'
