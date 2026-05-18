@@ -99,14 +99,18 @@ setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 
 # -- completion ----------------------------------------------------------------
 autoload -Uz compinit
-# -u: use completions from insecure dirs without prompting (fresh Ubuntu /usr/share/zsh
-#     often has group-writable dirs that would otherwise prompt at every login).
-# Rebuild the dump at most once a day.
-if [[ -n $(find "${ZDOTDIR:-$HOME}/.zcompdump"(Nmh+24) 2>/dev/null) ]]; then
-  compinit -u
-else
+# Full compinit scan can take 30-40s on servers with large $fpath.
+# Always load from cache; rebuild in background if stale or missing.
+_zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+if [[ -f "$_zcompdump" ]]; then
   compinit -C -u
+  if [[ -n $(find "$_zcompdump" -mmin +1440 -print 2>/dev/null) ]]; then
+    { compinit -u && zcompile "$_zcompdump" } &>/dev/null &!
+  fi
+else
+  { compinit -u && zcompile "$_zcompdump" } &>/dev/null &!
 fi
+unset _zcompdump
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+l:|=* r:|=*'
 zstyle ':completion:*' list-colors ''
