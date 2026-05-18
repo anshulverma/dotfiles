@@ -40,6 +40,31 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
     print -r -- "$line" >>| "$_zshrc_logfile"
     _zshrc_ts=$now
   }
+
+  _zshrc_exit_signal=""
+  for _sig in HUP TERM QUIT PIPE; do
+    eval "TRAP${_sig}() { _zshrc_exit_signal=$_sig; exit \$(( 128 + \$1 )); }"
+  done
+  unset _sig
+
+  zshexit() {
+    local rc=$?
+    [[ -z "$_zshrc_logfile" ]] && return
+    local now=$EPOCHREALTIME
+    local sec=${now%.*} frac=${now#*.}
+    local ts; ts=$(strftime '%m%d %H:%M:%S' $sec)
+    local info="exit_code=$rc"
+    [[ -n "$_zshrc_exit_signal" ]] && info+=" signal=SIG$_zshrc_exit_signal"
+    local dur_s=$(( now - _zshrc_t0 ))
+    if (( dur_s >= 3600 )); then
+      info+=$(printf ' session=%dh%dm' $(( dur_s / 3600 )) $(( dur_s % 3600 / 60 )))
+    elif (( dur_s >= 60 )); then
+      info+=$(printf ' session=%dm%ds' $(( dur_s / 60 )) $(( dur_s % 60 )))
+    else
+      info+=$(printf ' session=%.1fs' $dur_s)
+    fi
+    printf 'I%s.%s %d zshrc:exit] %s\n' "$ts" "${frac[1,6]}" $$ "$info" >>| "$_zshrc_logfile"
+  }
 fi
 
 # -- platform detection --------------------------------------------------------
@@ -185,5 +210,5 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   _zshrc_log "zshrc complete"
   ln -sf "$_zshrc_logfile" /tmp/zshrc-startup-latest.log
   unfunction _zshrc_log
-  unset _zshrc_t0 _zshrc_ts _zshrc_logfile
+  unset _zshrc_ts
 fi
