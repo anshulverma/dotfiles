@@ -5,10 +5,22 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   zmodload zsh/datetime
   _zshrc_t0=$EPOCHREALTIME
   _zshrc_ts=$_zshrc_t0
+  _zshrc_logfile="/tmp/zshrc-startup-$$.log"
+  : >| "$_zshrc_logfile"
   _zshrc_log() {
     local now=$EPOCHREALTIME
-    printf '[zshrc] %7.1fms (+%5.1fms)  %s\n' \
-      $(( (now - _zshrc_t0) * 1000 )) $(( (now - _zshrc_ts) * 1000 )) "$1" >&2
+    local cumul_ms=$(( (now - _zshrc_t0) * 1000 ))
+    local delta_ms=$(( (now - _zshrc_ts) * 1000 ))
+    local sec=${now%.*}
+    local frac=${now#*.}
+    local ts
+    ts=$(strftime '%m%d %H:%M:%S' $sec)
+    local usec=${frac[1,6]}
+    local line
+    printf -v line 'I%s.%s %d zshrc:%s] cumulative=%.1fms delta=%.1fms' \
+      "$ts" "$usec" $$ "$1" $cumul_ms $delta_ms
+    print -r -- "$line" >&2
+    print -r -- "$line" >>| "$_zshrc_logfile"
     _zshrc_ts=$now
   }
 fi
@@ -154,6 +166,7 @@ fi
 # -- startup timing teardown ---------------------------------------------------
 if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   _zshrc_log "zshrc complete"
+  ln -sf "$_zshrc_logfile" /tmp/zshrc-startup-latest.log
   unfunction _zshrc_log
-  unset _zshrc_t0 _zshrc_ts
+  unset _zshrc_t0 _zshrc_ts _zshrc_logfile
 fi
