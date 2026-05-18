@@ -1,9 +1,12 @@
 # Environment variables — sourced for all zsh invocations (including non-interactive).
 # Keep this file minimal; interactive configuration belongs in .zshrc.
 
-# Enable zshrc startup timing on ondemand devservers.
-if [[ -d /ondemand ]] && [[ -z "${ZSH_DEBUG_STARTUP+x}" ]]; then
-  export ZSH_DEBUG_STARTUP=1
+# Enable zshrc startup timing: auto-enabled on ondemand devservers,
+# or persistently via "touch ~/.zsh-debug-startup".
+if [[ -z "${ZSH_DEBUG_STARTUP+x}" ]]; then
+  if [[ -f "$HOME/.zsh-debug-startup" ]] || [[ -d /ondemand ]]; then
+    export ZSH_DEBUG_STARTUP=1
+  fi
 fi
 
 export EDITOR="${EDITOR:-vim}"
