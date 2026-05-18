@@ -7,6 +7,23 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   _zshrc_ts=$_zshrc_t0
   _zshrc_logfile="/tmp/zshrc-startup-$$.log"
   : >| "$_zshrc_logfile"
+
+  # emit a header with shell invocation context
+  {
+    local _flags=""
+    [[ -o interactive ]] && _flags+="i" || _flags+="-"
+    [[ -o login ]]       && _flags+="l" || _flags+="-"
+    print -r -- "# pid=$$ ppid=$PPID uid=$UID flags=$_flags"
+    local _tty; _tty=$(tty 2>/dev/null) || _tty="not a tty"
+    print -r -- "# tty=$_tty"
+    print -r -- "# term=$TERM term_program=${TERM_PROGRAM:-unset} lang=${LANG:-unset}"
+    [[ -n "${SSH_CONNECTION:-}" ]] && print -r -- "# ssh=$SSH_CONNECTION"
+    local _parent_cmd
+    _parent_cmd=$(ps -o comm= -p $PPID 2>/dev/null) || _parent_cmd="unknown"
+    print -r -- "# parent_cmd=$_parent_cmd"
+    print -r -- "# argv=$ZSH_ARGZERO $@"
+  } >>| "$_zshrc_logfile"
+
   _zshrc_log() {
     local now=$EPOCHREALTIME
     local cumul_ms=$(( (now - _zshrc_t0) * 1000 ))
