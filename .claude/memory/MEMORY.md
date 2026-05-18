@@ -1,0 +1,1 @@
+- [ZSH startup timing](zshrc-debug-startup-timing.md) — per-section timing in .zshrc, auto-enabled on ondemand via ZSH_DEBUG_STARTUP

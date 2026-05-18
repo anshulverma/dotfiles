@@ -1,11 +1,25 @@
 # Interactive zsh configuration.
 
+# -- startup timing (set ZSH_DEBUG_STARTUP=1 to enable) -----------------------
+if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
+  zmodload zsh/datetime
+  _zshrc_t0=$EPOCHREALTIME
+  _zshrc_ts=$_zshrc_t0
+  _zshrc_log() {
+    local now=$EPOCHREALTIME
+    printf '[zshrc] %7.1fms (+%5.1fms)  %s\n' \
+      $(( (now - _zshrc_t0) * 1000 )) $(( (now - _zshrc_ts) * 1000 )) "$1" >&2
+    _zshrc_ts=$now
+  }
+fi
+
 # -- platform detection --------------------------------------------------------
 case "$OSTYPE" in
   darwin*) IS_MAC=1 ;;
   linux*)  IS_LINUX=1 ;;
 esac
 [[ -n "${CODESPACES:-}" ]] && IS_CODESPACES=1
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "platform detection"
 
 # -- homebrew (macOS) ----------------------------------------------------------
 if [[ -n "${IS_MAC:-}" ]]; then
@@ -15,6 +29,7 @@ if [[ -n "${IS_MAC:-}" ]]; then
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 fi
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "homebrew"
 
 # -- history -------------------------------------------------------------------
 HISTFILE="$HOME/.zsh_history"
@@ -22,9 +37,11 @@ HISTSIZE=50000
 SAVEHIST=50000
 setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS \
        HIST_VERIFY EXTENDED_HISTORY INC_APPEND_HISTORY
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "history"
 
 # -- directory navigation ------------------------------------------------------
 setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "directory navigation"
 
 # -- completion ----------------------------------------------------------------
 autoload -Uz compinit
@@ -40,6 +57,7 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+l:|=* r:|=*'
 zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' group-name ''
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "completion"
 
 # -- keybindings ---------------------------------------------------------------
 # Match the emacs-style bindings from .inputrc.
@@ -48,6 +66,7 @@ bindkey '^P' history-search-backward
 bindkey '^N' history-search-forward
 bindkey "${terminfo[kcuu1]:-^[[A}" history-search-backward
 bindkey "${terminfo[kcud1]:-^[[B}" history-search-forward
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "keybindings"
 
 # -- prompt --------------------------------------------------------------------
 autoload -Uz vcs_info
@@ -57,6 +76,7 @@ precmd() { vcs_info }
 setopt PROMPT_SUBST
 PROMPT='%F{cyan}%n@%m%f %F{yellow}%~%f${vcs_info_msg_0_}
 %(?.%F{green}.%F{red})❯%f '
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "prompt"
 
 # -- aliases -------------------------------------------------------------------
 if ls --color=auto >/dev/null 2>&1; then
@@ -76,6 +96,7 @@ alias gd='git diff'
 alias gl='git log --oneline --graph --decorate -20'
 alias gco='git checkout'
 alias gcb='git checkout -b'
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "aliases"
 
 # -- safety nets ---------------------------------------------------------------
 alias rm='rm -i'
@@ -91,6 +112,7 @@ alias h='history'
 alias j='jobs -l'
 alias du='du -kh'
 alias df='df -kTh 2>/dev/null || df -kh'
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "shortcuts"
 
 # -- tmux ----------------------------------------------------------------------
 alias tmuxa='tmux -2 a'
@@ -103,6 +125,7 @@ if [[ $- == *i* ]] && [[ -n "${SSH_CONNECTION:-}" ]] && [[ -z "${TMUX:-}" ]] && 
     exec tmux -2 attach
   fi
 fi
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "tmux"
 
 # -- docker --------------------------------------------------------------------
 alias docker-rm-all='docker rm $(docker ps -a -q)'
@@ -111,6 +134,7 @@ docker-exec()    { docker exec -it "$(docker_container_id "$1")" bash; }
 docker-kill()    { docker kill      "$(docker_container_id "$1")"; }
 docker-inspect() { docker inspect   "$(docker_container_id "$1")"; }
 docker-ip()      { docker inspect -f '{{.NetworkSettings.IPAddress}}' "$@"; }
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "docker"
 
 # -- misc ----------------------------------------------------------------------
 httph() { curl -iksD - "$1" -o /dev/null; }  # dump headers for a URL
@@ -120,7 +144,16 @@ if [[ -n "${IS_MAC:-}" ]]; then
   alias sleep-computer='osascript -e "tell application \"Finder\" to sleep"'
   chrome() { open -a 'Google Chrome' "${1:-https://google.com}"; }
 fi
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "misc"
 
 # -- local overrides -----------------------------------------------------------
 # Per-machine settings (secrets, work-specific aliases) go in ~/.zshrc.local.
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "local overrides"
+
+# -- startup timing teardown ---------------------------------------------------
+if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
+  _zshrc_log "zshrc complete"
+  unfunction _zshrc_log
+  unset _zshrc_t0 _zshrc_ts
+fi
