@@ -3,7 +3,7 @@
 	email = anshul.verma86@gmail.com
 
 [core]
-	editor = vim
+	editor = emacsclient -nw --alternate-editor=
 	autocrlf = input
 	excludesfile = ~/.gitignore_global
 
