@@ -124,6 +124,10 @@ bindkey '^P' history-search-backward
 bindkey '^N' history-search-forward
 bindkey "${terminfo[kcuu1]:-^[[A}" history-search-backward
 bindkey "${terminfo[kcud1]:-^[[B}" history-search-forward
+# Alt+Backspace: delete one shell word (stop at /, ., -, etc.) instead of a
+# WORD that spans the entire path.
+autoload -U select-word-style
+select-word-style bash
 [[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "keybindings"
 
 # -- prompt --------------------------------------------------------------------
