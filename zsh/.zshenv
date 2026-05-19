@@ -9,8 +9,6 @@ if [[ -z "${ZSH_DEBUG_STARTUP+x}" ]]; then
   fi
 fi
 
-export EDITOR="emacsclient -nw --alternate-editor="
-export VISUAL="$EDITOR"
 export PAGER="${PAGER:-less}"
 export LESS='-R -i -M -x4'
 export LANG="${LANG:-en_US.UTF-8}"
@@ -29,4 +27,10 @@ path=(
   "$_DOTFILES_DIR/bin/applescripts"
   $path
 )
+
+# $EDITOR must be a single executable: some tools exec it directly without
+# word-splitting. The wrapper in bin/scripts handles the emacsclient flags.
+export EDITOR="$_DOTFILES_DIR/bin/scripts/emacseditor"
+export VISUAL="$EDITOR"
+
 unset _DOTFILES_DIR

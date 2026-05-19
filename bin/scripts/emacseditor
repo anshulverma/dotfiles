@@ -1,0 +1,10 @@
+#!/bin/sh
+# Single-word $EDITOR wrapper.
+#
+# Some tools exec $EDITOR directly without word-splitting, which breaks a
+# multi-word value like "emacsclient -nw --alternate-editor=". Pointing
+# $EDITOR at this script keeps EDITOR a single executable.
+#
+# Opens files in the running Emacs server (terminal frame); the empty
+# --alternate-editor starts an Emacs daemon when no server is up.
+exec emacsclient -nw --alternate-editor= "$@"
