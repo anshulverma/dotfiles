@@ -252,6 +252,10 @@ tmux_conf_copy_to_os_clipboard=true
 # increase history size
 set -g history-limit 10000
 
+# launch non-login shells — login shells trigger /etc/shell-login.d/ scripts
+# (systemd env loading, dotfiles sync wait) that can block for 25+ seconds
+set -g default-command "${SHELL}"
+
 # force Vi mode
 #   really you should export VISUAL or EDITOR environment variable, see manual
 #set -g status-keys vi

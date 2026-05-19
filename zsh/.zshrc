@@ -3,10 +3,9 @@
 # -- startup timing (set ZSH_DEBUG_STARTUP=1 to enable) -----------------------
 if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   zmodload zsh/datetime
-  _zshrc_t0=$EPOCHREALTIME
+  _zshrc_t0=${_zshenv_t0:-$EPOCHREALTIME}
   _zshrc_ts=$_zshrc_t0
-  _zshrc_logfile="/tmp/zshrc-startup-$$.log"
-  : >| "$_zshrc_logfile"
+  _zshrc_logfile="${_zshrc_logfile:-/tmp/zshrc-startup-$$.log}"
 
   # emit a header with shell invocation context
   {
@@ -65,6 +64,8 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
     fi
     printf 'I%s.%s %d zshrc:exit] %s\n' "$ts" "${frac[1,6]}" $$ "$info" >>| "$_zshrc_logfile"
   }
+
+  _zshrc_log "pre-zshrc"
 fi
 
 # -- platform detection --------------------------------------------------------
@@ -218,5 +219,5 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   _zshrc_log "zshrc complete"
   ln -sf "$_zshrc_logfile" /tmp/zshrc-startup-latest.log
   unfunction _zshrc_log
-  unset _zshrc_ts
+  unset _zshrc_ts _zshenv_t0 _zshenv_done
 fi
