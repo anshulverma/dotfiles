@@ -239,3 +239,5 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   unfunction _zshrc_log
   unset _zshrc_ts _zshenv_t0 _zshenv_done
 fi
+
+export PATH="$HOME/.local/nodejs/shim:$PATH"  # modern node (registry-installed; nodejs.org blocked) [claude]
