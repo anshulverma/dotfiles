@@ -76,6 +76,14 @@ esac
 [[ -n "${CODESPACES:-}" ]] && IS_CODESPACES=1
 [[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "platform detection"
 
+# -- Meta-internal rc (devvm / ondemand only) ----------------------------------
+# Required for dev connect, tmux session handling, and other internal tooling.
+# No-op elsewhere since these files only exist on Meta hosts. Sourced early so
+# the rest of this file can override anything they set. See fburl/required_zshrc.
+[[ -f /etc/zshrc ]] && source /etc/zshrc
+[[ -f /usr/facebook/ops/rc/master.zshrc ]] && source /usr/facebook/ops/rc/master.zshrc
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "meta-internal rc"
+
 # -- homebrew (macOS) ----------------------------------------------------------
 if [[ -n "${IS_MAC:-}" ]]; then
   if [[ -x /opt/homebrew/bin/brew ]]; then
