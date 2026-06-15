@@ -76,6 +76,16 @@ esac
 [[ -n "${CODESPACES:-}" ]] && IS_CODESPACES=1
 [[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "platform detection"
 
+# -- Meta-internal rc (devvm / ondemand) ---------------------------------------
+# On Meta devservers the rc-validation check (/etc/shell-login.d/validate-zshrc)
+# warns "your zshrc lacks important lines" unless this file sources master.zshrc.
+# master.zshrc itself only loads completions and /etc/shell-rc.d/* (no tmux), so
+# this is purely to satisfy validation and wire up internal tooling. Guarded
+# with [[ -f ]] so it's a no-op on macOS / Ubuntu / Codespaces.
+# Reference: fburl/required_zshrc.
+[[ -f /usr/facebook/ops/rc/master.zshrc ]] && source /usr/facebook/ops/rc/master.zshrc
+[[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "meta-internal rc"
+
 # -- homebrew (macOS) ----------------------------------------------------------
 if [[ -n "${IS_MAC:-}" ]]; then
   if [[ -x /opt/homebrew/bin/brew ]]; then
@@ -181,12 +191,13 @@ alias df='df -kTh 2>/dev/null || df -kh'
 alias tmuxa='tmux -2 a'
 tmw() { tmux split-window -dh "$*"; }   # run a command in a new split
 
-# Auto-attach to tmux on SSH login when a session exists.
+# Auto-attach to tmux on SSH login: attach to the "main" session, creating it if
+# absent. Uses `new-session -A` rather than a bare `attach` so a wedged/stale
+# server (e.g. a dead default socket) can't leave us with a `no sessions` error
+# that, via exec, would kill the login shell and drop the connection.
 # Guards: interactive shell, SSH login, not already inside tmux, tmux installed.
 if [[ $- == *i* ]] && [[ -n "${SSH_CONNECTION:-}" ]] && [[ -z "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1; then
-  if tmux list-sessions >/dev/null 2>&1; then
-    exec tmux -2 attach
-  fi
+  exec tmux -2 new-session -A -s main
 fi
 [[ -n "${ZSH_DEBUG_STARTUP:-}" ]] && _zshrc_log "tmux"
 
