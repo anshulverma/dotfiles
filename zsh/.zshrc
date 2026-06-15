@@ -110,18 +110,36 @@ setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 
 # -- completion ----------------------------------------------------------------
 autoload -Uz compinit
-# Full compinit scan can take 30-40s on servers with large $fpath.
-# Always load from cache; rebuild in background if stale or missing.
+# Full compinit scan can take 30-40s on servers with large $fpath, so we never
+# run it in the foreground: the current shell loads the existing cache with -C
+# (skips the security check, ~10ms), and a stale/missing dump is rebuilt in the
+# background. The rebuild writes to a temp file and atomically renames it, with
+# a lock to prevent concurrent rebuilds -- otherwise two shells starting at once
+# (e.g. several tmux panes) can interleave their writes and corrupt the dump,
+# which silently breaks tab completion until the file is regenerated.
 _zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
 if [[ -f "$_zcompdump" ]]; then
-  compinit -C -u
-  if [[ -n $(find "$_zcompdump" -mmin +1440 -print 2>/dev/null) ]]; then
-    { compinit -u && zcompile "$_zcompdump" } &>/dev/null &!
-  fi
+  compinit -C -u -d "$_zcompdump"
+  [[ -n $(find "$_zcompdump" -mmin +1440 -print 2>/dev/null) ]] && _zcompstale=1
 else
-  { compinit -u && zcompile "$_zcompdump" } &>/dev/null &!
+  _zcompstale=1
 fi
-unset _zcompdump
+if [[ -n "${_zcompstale:-}" ]]; then
+  (
+    lock="${_zcompdump}.lock"
+    find "$lock" -mmin +60 -delete 2>/dev/null   # drop a lock from a crashed rebuild
+    if ( set -o noclobber; : >"$lock" ) 2>/dev/null; then
+      tmp="${_zcompdump}.new.$$"
+      if compinit -u -d "$tmp"; then
+        zcompile "$tmp"
+        mv -f "$tmp" "$_zcompdump"
+        [[ -f "$tmp.zwc" ]] && mv -f "$tmp.zwc" "${_zcompdump}.zwc"
+      fi
+      rm -f "$tmp" "$tmp.zwc" "$lock"
+    fi
+  ) &>/dev/null &!
+fi
+unset _zcompdump _zcompstale
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+l:|=* r:|=*'
 zstyle ':completion:*' list-colors ''
@@ -232,3 +250,5 @@ if [[ -n "${ZSH_DEBUG_STARTUP:-}" ]]; then
   unfunction _zshrc_log
   unset _zshrc_ts _zshenv_t0 _zshenv_done
 fi
+
+export PATH="$HOME/.local/nodejs/shim:$PATH"  # modern node (registry-installed; nodejs.org blocked) [claude]
