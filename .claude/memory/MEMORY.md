@@ -1,1 +1,2 @@
 - [ZSH startup timing](zshrc-debug-startup-timing.md) — per-section timing in .zshrc, auto-enabled on ondemand via ZSH_DEBUG_STARTUP
+- [OD first-login bootstrap](od-first-login-bootstrap.md) — fresh OD setup via ~/.zprofile + dotsync2 post-pull; trailing-& bug fix + ghostty terminfo

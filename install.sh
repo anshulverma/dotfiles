@@ -60,6 +60,14 @@ install_packages_macos() {
 }
 
 install_packages_debian() {
+  # Meta on-demand servers (and most provisioned boxes) already ship zsh/tmux/
+  # git/vim. apt-get update+install there is slow and needs sudo — on a fresh OD
+  # that delay is what makes the first login race the dotfiles clone. Skip it
+  # entirely when the core tools are already present.
+  if command -v zsh tmux git vim >/dev/null 2>&1; then
+    log "core packages already present (zsh/tmux/git/vim); skipping apt"
+    return
+  fi
   log "Installing packages via apt"
   if [[ $EUID -eq 0 ]]; then
     apt-get update -y
@@ -68,6 +76,19 @@ install_packages_debian() {
     sudo apt-get update -y
     sudo apt-get install -y zsh tmux git vim curl
   fi
+}
+
+# Install the vendored xterm-ghostty terminfo into ~/.terminfo so terminals
+# launched from Ghostty (tmux, ssh) don't fail with "missing or unsuitable
+# terminal: xterm-ghostty" on hosts where Ghostty itself isn't installed.
+# User-level (~/.terminfo) so it needs no sudo; no-op if already known.
+install_terminfo() {
+  local src="$DOTFILES_DIR/ghostty/xterm-ghostty.terminfo"
+  [[ -f "$src" ]] || return 0
+  command -v tic >/dev/null 2>&1 || { warn "tic not found; skipping terminfo install"; return 0; }
+  if infocmp -x xterm-ghostty >/dev/null 2>&1; then return 0; fi
+  log "Installing xterm-ghostty terminfo -> ~/.terminfo"
+  tic -x -o "$HOME/.terminfo" "$src" 2>/dev/null || warn "tic failed for $src"
 }
 
 install_tpm() {
@@ -151,6 +172,7 @@ main() {
   fi
 
   link_all
+  install_terminfo   # always — fast, no sudo, and unrelated to package install
 
   if [[ $LINK_ONLY -eq 0 ]]; then
     switch_login_shell_codespaces

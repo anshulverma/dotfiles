@@ -42,6 +42,7 @@ Post-install:
 | `readline/.inputrc`    | `~/.inputrc`                       | emacs mode, history-search on arrows                         |
 | `gradle/gradle.properties` | `~/.gradle/gradle.properties`  | enables gradle daemon                                        |
 | `ghostty/config`       | `~/.config/ghostty/config`         | Ghostty terminal config; machine-specific overrides in `~/.config/ghostty/config.local` |
+| `ghostty/xterm-ghostty.terminfo` | `~/.terminfo` (via `tic`)| vendored terminfo; `install.sh` installs it so tmux/ssh from Ghostty work on hosts without Ghostty (e.g. servers) |
 | `bin/scripts/`, `bin/applescripts/` | (added to `PATH` by `.zshenv`) | personal scripts; see `bin/README.md`             |
 
 ## Per-machine overrides
