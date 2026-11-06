@@ -1,0 +1,16 @@
+#!/bin/bash
+# Fetch a blob by handle into a temp file and print it.
+# The fetch command comes from $EVCAT_FETCH_CMD (default: blob_get).
+# Read ~/.claude/LOCAL.md if present for local names and details.
+
+FETCH_CMD="${EVCAT_FETCH_CMD:-blob_get}"
+BASEDIR="$HOME/.tmp/evcat"
+mkdir -p $BASEDIR
+tmpfile=$(mktemp "$BASEDIR/blob-XXXXXX")
+echo $tmpfile
+
+HANDLE=$1
+
+$FETCH_CMD $tmpfile $HANDLE
+cat $tmpfile
+rm $tmpfile

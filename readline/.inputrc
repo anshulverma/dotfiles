@@ -1,0 +1,22 @@
+# up and down arrows
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+
+# left and right arrows
+"\e[C": forward-char
+"\e[D": backward-char
+
+"C-p": history-search-backward
+"C-n": history-search-forward
+
+"^[^[[D": backward-char
+
+set completion-ignore-case on
+set bell-style visible
+set expand-tilde on
+set convert-meta off
+set input-meta on
+set output-meta on
+set show-all-if-ambiguous on
+set visible-stats on
+set editing-mode emacs

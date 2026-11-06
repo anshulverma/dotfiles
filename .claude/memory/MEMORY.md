@@ -1,0 +1,2 @@
+- [ZSH startup timing](zshrc-debug-startup-timing.md) — per-section timing in .zshrc, enabled via ZSH_DEBUG_STARTUP or the ~/.zsh-debug-startup marker
+- [First-login bootstrap](first-login-bootstrap.md) — fresh remote host setup via ~/.zprofile + sync-tool post-pull hook; trailing-& bug fix + ghostty terminfo

@@ -1,0 +1,57 @@
+[user]
+	name = Anshul Verma
+	email = anshul.verma86@gmail.com
+
+[core]
+	editor = emacsclient -nw --alternate-editor=
+	autocrlf = input
+	excludesfile = ~/.gitignore_global
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[rebase]
+	autoStash = true
+
+[merge]
+	conflictStyle = zdiff3
+
+[diff]
+	colorMoved = zebra
+	algorithm = histogram
+
+[color]
+	ui = auto
+
+[rerere]
+	enabled = true
+
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	ci = commit
+	cia = commit --amend
+	df = diff
+	dc = diff --cached
+	lg = log --oneline --graph --decorate --all
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	uncommit = reset --soft HEAD~1
+
+# Per-machine overrides (work email, signing key, credential helpers) belong
+# in ~/.gitconfig.local. `gh auth setup-git` wants to write credential.helper
+# blocks into the file ~/.gitconfig resolves to — keep them in the override
+# file so they don't end up in the repo.
+[include]
+	path = ~/.gitconfig.local

@@ -1,0 +1,400 @@
+# https://github.com/gpakosz/.tmux
+# (‑●‑●)> released under the WTFPL v2 license, by Gregory Pakosz (@gpakosz)
+
+
+# -- navigation ----------------------------------------------------------------
+
+# if you're running tmux within iTerm2
+#   - and tmux is 1.9 or 1.9a
+#   - and iTerm2 is configured to let option key act as +Esc
+#   - and iTerm2 is configured to send [1;9A -> [1;9D for option + arrow keys
+# then uncomment the following line to make Meta + arrow keys mapping work
+#set -ga terminal-overrides "*:kUP3=\e[1;9A,*:kDN3=\e[1;9B,*:kRIT3=\e[1;9C,*:kLFT3=\e[1;9D"
+
+
+# -- windows & pane creation ---------------------------------------------------
+
+# new window retains current path, possible values are:
+#   - true
+#   - false (default)
+tmux_conf_new_window_retain_current_path=true
+
+# new pane retains current path, possible values are:
+#   - true (default)
+#   - false
+tmux_conf_new_pane_retain_current_path=true
+
+# new pane tries to reconnect ssh sessions (experimental), possible values are:
+#   - true
+#   - false (default)
+tmux_conf_new_pane_reconnect_ssh=false
+
+# prompt for session name when creating a new session, possible values are:
+#   - true
+#   - false (default)
+tmux_conf_new_session_prompt=false
+
+
+# -- display -------------------------------------------------------------------
+
+# RGB 24-bit colour support (tmux >= 2.2), possible values are:
+#  - true
+#  - false (default)
+tmux_conf_theme_24b_colour=false
+
+# window style
+tmux_conf_theme_window_fg='default'
+tmux_conf_theme_window_bg='default'
+
+# highlight focused pane (tmux >= 2.1), possible values are:
+#   - true
+#   - false (default)
+tmux_conf_theme_highlight_focused_pane=false
+
+# focused pane colours:
+tmux_conf_theme_focused_pane_fg='default'
+tmux_conf_theme_focused_pane_bg='#0087d7'               # light blue
+
+# pane border style, possible values are:
+#   - thin (default)
+#   - fat
+tmux_conf_theme_pane_border_style=thin
+
+# pane borders colours:
+tmux_conf_theme_pane_border='#444444'                   # gray
+tmux_conf_theme_pane_active_border='#00afff'            # light blue
+
+# pane indicator colours
+tmux_conf_theme_pane_indicator='#00afff'                # light blue
+tmux_conf_theme_pane_active_indicator='#00afff'         # light blue
+
+# status line style
+tmux_conf_theme_message_fg='#000000'                    # black
+tmux_conf_theme_message_bg='#ffff00'                    # yellow
+tmux_conf_theme_message_attr='bold'
+
+# status line command style (<prefix> : Escape)
+tmux_conf_theme_message_command_fg='#ffff00'            # yellow
+tmux_conf_theme_message_command_bg='#000000'            # black
+tmux_conf_theme_message_command_attr='bold'
+
+# window modes style
+tmux_conf_theme_mode_fg='#000000'                       # black
+tmux_conf_theme_mode_bg='#ffff00'                       # yellow
+tmux_conf_theme_mode_attr='bold'
+
+# status line style
+tmux_conf_theme_status_fg='#8a8a8a'                     # light gray
+tmux_conf_theme_status_bg='#080808'                     # dark gray
+tmux_conf_theme_status_attr='none'
+
+# window status style
+#   - built-in variables are:
+#     - #{circled_window_index}
+tmux_conf_theme_window_status_fg='#8a8a8a'              # light gray
+tmux_conf_theme_window_status_bg='#080808'              # dark gray
+tmux_conf_theme_window_status_attr='none'
+# Markers ride alongside the bg colour because tmux style precedence
+# (bell > activity > last > base) means a "last" window with activity
+# would otherwise show only the activity yellow, hiding the green.
+tmux_conf_theme_window_status_format='#I #W#{?window_last_flag,«,}#{?window_activity_flag,•,}#{?window_bell_flag,!,}'
+#tmux_conf_theme_window_status_format='#{circled_window_index} #W'
+#tmux_conf_theme_window_status_format='#I #W#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}'
+
+# window current status style
+#   - built-in variables are:
+#     - #{circled_window_index}
+tmux_conf_theme_window_status_current_fg='#000000'      # black
+tmux_conf_theme_window_status_current_bg='#00afff'      # light blue
+tmux_conf_theme_window_status_current_attr='bold'
+tmux_conf_theme_window_status_current_format='#I #W#{?window_zoomed_flag,🔍,}'
+#tmux_conf_theme_window_status_current_format='#{circled_window_index} #W'
+#tmux_conf_theme_window_status_current_format='#I #W#{?window_zoomed_flag,🔍,}'
+
+# window activity status style — yellow bg fill so new output is unmissable
+tmux_conf_theme_window_status_activity_fg='#000000'     # black
+tmux_conf_theme_window_status_activity_bg='#ffd700'     # bright yellow
+tmux_conf_theme_window_status_activity_attr='bold'
+
+# window bell status style — red bg + blink, "something is wrong" alarm
+tmux_conf_theme_window_status_bell_fg='#ffffff'         # white
+tmux_conf_theme_window_status_bell_bg='#d70000'         # red
+tmux_conf_theme_window_status_bell_attr='blink,bold'
+
+# window last (previously focused) — green fill, distinct hue from active blue
+tmux_conf_theme_window_status_last_fg='#000000'         # black
+tmux_conf_theme_window_status_last_bg='#87d75f'         # green
+tmux_conf_theme_window_status_last_attr='bold'
+
+# status left/right sections separators
+tmux_conf_theme_left_separator_main=''
+tmux_conf_theme_left_separator_sub='|'
+tmux_conf_theme_right_separator_main=''
+tmux_conf_theme_right_separator_sub='|'
+#tmux_conf_theme_left_separator_main=''  # /!\ you don't need to install Powerline
+#tmux_conf_theme_left_separator_sub=''   #   you only need fonts patched with
+#tmux_conf_theme_right_separator_main='' #   Powerline symbols or the standalone
+#tmux_conf_theme_right_separator_sub=''  #   PowerlineSymbols.otf font
+
+# status left/right content:
+#   - separate main sections with '|'
+#   - separate subsections with ','
+#   - built-in variables are:
+#     - #{battery_bar}
+#     - #{battery_hbar}
+#     - #{battery_percentage}
+#     - #{battery_status}
+#     - #{battery_vbar}
+#     - #{circled_session_name}
+#     - #{hostname_ssh}
+#     - #{hostname}
+#     - #{loadavg}
+#     - #{pairing}
+#     - #{prefix}
+#     - #{root}
+#     - #{uptime_d}
+#     - #{uptime_h}
+#     - #{uptime_m}
+#     - #{uptime_s}
+#     - #{username}
+#     - #{username_ssh}
+# tmux_conf_theme_status_left=' ❐ #S | ↑#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} '
+tmux_conf_theme_status_left=''
+
+# tmux_conf_theme_status_right='#{prefix}#{pairing} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname} '
+tmux_conf_theme_status_right='#{prefix}#{pairing} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b'
+
+# status left style
+tmux_conf_theme_status_left_fg='#000000,#e4e4e4,#e4e4e4'  # black, white , white
+tmux_conf_theme_status_left_bg='#ffff00,#ff00af,#00afff'  # yellow, pink, white blue
+tmux_conf_theme_status_left_attr='bold,none,none'
+
+# status right style
+tmux_conf_theme_status_right_fg='#8a8a8a,#e4e4e4,#000000' # light gray, white, black
+tmux_conf_theme_status_right_bg='#080808,#d70000,#e4e4e4' # dark gray, red, white
+tmux_conf_theme_status_right_attr='none,none,bold'
+
+# pairing indicator
+tmux_conf_theme_pairing='👓'          # U+1F453
+tmux_conf_theme_pairing_fg='none'
+tmux_conf_theme_pairing_bg='none'
+tmux_conf_theme_pairing_attr='none'
+
+# prefix indicator
+tmux_conf_theme_prefix='⌨'            # U+2328
+tmux_conf_theme_prefix_fg='none'
+tmux_conf_theme_prefix_bg='none'
+tmux_conf_theme_prefix_attr='none'
+
+# root indicator
+tmux_conf_theme_root='!'
+tmux_conf_theme_root_fg='none'
+tmux_conf_theme_root_bg='none'
+tmux_conf_theme_root_attr='bold,blink'
+
+# battery bar symbols
+tmux_conf_battery_bar_symbol_full='◼'
+tmux_conf_battery_bar_symbol_empty='◻'
+#tmux_conf_battery_bar_symbol_full='♥'
+#tmux_conf_battery_bar_symbol_empty='·'
+
+# battery bar length (in number of symbols), possible values are:
+#   - auto
+#   - a number, e.g. 5
+tmux_conf_battery_bar_length='auto'
+
+# battery bar palette, possible values are:
+#   - gradient (default)
+#   - heat
+#   - 'colour_full_fg,colour_empty_fg,colour_bg'
+tmux_conf_battery_bar_palette='gradient'
+#tmux_conf_battery_bar_palette='#d70000,#e4e4e4,#000000'   # red, white, black
+
+# battery hbar palette, possible values are:
+#   - gradient (default)
+#   - heat
+#   - 'colour_low,colour_half,colour_full'
+tmux_conf_battery_hbar_palette='gradient'
+#tmux_conf_battery_hbar_palette='#d70000,#ff5f00,#5fff00'  # red, orange, green
+
+# battery vbar palette, possible values are:
+#   - gradient (default)
+#   - heat
+#   - 'colour_low,colour_half,colour_full'
+tmux_conf_battery_vbar_palette='gradient'
+#tmux_conf_battery_vbar_palette='#d70000,#ff5f00,#5fff00'  # red, orange, green
+
+# symbols used to indicate whether battery is charging or discharging
+tmux_conf_battery_status_charging='↑'       # U+2191
+tmux_conf_battery_status_discharging='↓'    # U+2193
+#tmux_conf_battery_status_charging='⚡ '    # U+26A1
+#tmux_conf_battery_status_charging='🔌 '    # U+1F50C
+#tmux_conf_battery_status_discharging='🔋 ' # U+1F50B
+
+# clock style
+tmux_conf_theme_clock_colour='#00afff'  # light blue
+tmux_conf_theme_clock_style='24'
+
+
+# -- clipboard -----------------------------------------------------------------
+
+# in copy mode, copying selection also copies to the OS clipboard
+#   - true
+#   - false (default)
+# on macOS, this requires installing reattach-to-user-namespace, see README.md
+# on Linux, this requires xsel or xclip
+tmux_conf_copy_to_os_clipboard=true
+
+
+# -- user customizations -------------------------------------------------------
+# this is the place to override or undo settings
+
+# increase history size
+set -g history-limit 10000
+
+# launch non-login shells — login shells trigger the host's login scripts
+# (systemd env loading, dotfiles sync wait) that can block for 25+ seconds
+set -g default-command "${SHELL}"
+
+# force Vi mode
+#   really you should export VISUAL or EDITOR environment variable, see manual
+#set -g status-keys vi
+set -g mode-keys vi
+
+# replace C-b by C-q instead of using both prefixes
+set -gu prefix2
+unbind C-a
+unbind C-b
+set -g prefix C-q
+bind C-q send-prefix
+
+# move status line to top
+#set -g status-position top
+
+# don't rename windows automatically
+set-option -g allow-rename off
+
+# Default to emacs style mode keys
+setw -g mode-keys emacs
+
+### Session initialization
+# Personal layout; requires htop and emacsclient. Uncomment to enable.
+# new -s avee -n status htop
+# splitw -h -p 10 -t 1 watch uptime
+# splitw -v -p 50 -t 2 watch df -h
+# selectp -t 1
+# neww -n emacs emacsclient -nw
+# neww -n workspace
+# selectw -t 3
+
+# enable activity alerts
+setw -g monitor-activity on
+set -g visual-activity off
+
+### mouse
+
+# Mouse mode — off by default so the terminal (e.g. iPad Terminus) can do
+# native text selection. Toggle on with prefix+m when you want tmux-level
+# scroll/pane-resize; prefix+M turns it back off.
+set-option -g mouse off
+
+# forward copies to the terminal's system clipboard via OSC 52
+set -g set-clipboard on
+
+# iOS/iPadOS hardcodes Ctrl+Space for input-source switching, so it never
+# reaches tmux over a Bluetooth keyboard. Add `v` as an alternative to the
+# default C-Space for begin-selection in emacs copy-mode (plain letters are
+# otherwise unbound there). C-Space still works on a normal keyboard.
+bind-key -T copy-mode v send -X begin-selection
+
+# drag-select with the mouse copies the selection and exits copy mode
+bind-key -T copy-mode    MouseDragEnd1Pane send -X copy-selection-and-cancel
+bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection-and-cancel
+
+# Drop tmux's default right-click context menus. They contain `split-window`
+# inside deeply-nested `#{...}` menu items, which gpakosz's `_apply_bindings`
+# can't parse — its awk+sed quoting logic produces malformed shell, `eval`
+# hits a dash syntax error, and `set -e` aborts before `_apply_theme` runs
+# (the "cut -c3- ~/.tmux.conf | sh -s _apply_configuration returned 2"
+# message). Unbinding here, before the gpakosz post-processing runs, lets
+# the script exit cleanly. We don't use the right-click menus anyway.
+unbind-key -T root MouseDown3Pane
+unbind-key -T root MouseDown3Status
+unbind-key -T root MouseDown3StatusLeft
+unbind-key -T root M-MouseDown3Pane
+unbind-key -T root M-MouseDown3Status
+unbind-key -T root M-MouseDown3StatusLeft
+
+set -g @scroll-down-exit-copy-mode "off"
+set -g @scroll-without-changing-pane "on"
+set -g @scroll-in-moused-over-pane "on"
+set -g @scroll-soeed-num-lines-per-scroll "3"
+set -g @emulate-scroll-for-no-mouse-alternate-buffer "on"
+
+# Toggle mouse on
+bind-key m \
+    set-option -g mouse on \;\
+    display 'Mouse: ON'
+
+# Toggle mouse off
+bind-key M \
+    set-option -g mouse off \;\
+    display 'Mouse: OFF'
+
+###
+
+#urxvt tab like window switching (-n: no prior escape seq)
+bind -n S-left prev
+bind -n S-right next
+bind -n M-left swap-window -t -1
+bind -n M-right swap-window -t +1
+
+# shortcuts to close/open windows
+unbind-key &
+bind-key & kill-session
+bind-key w kill-pane
+bind-key W kill-window
+bind -n M-n split-window -h -c '#{pane_current_path}'
+bind -n M-N split-window -c '#{pane_current_path}'
+bind -n M-t new-window -c '#{pane_current_path}'
+bind-key '"' split-window -c '#{pane_current_path}'
+bind-key % split-window -h -c '#{pane_current_path}'
+bind-key S command-prompt "new-session -A -c '#{pane_current_path}' -s '%%'"
+
+# easy detach
+bind-key -n C-j detach
+
+# clear buffer using C-q k
+bind-key k send-keys -R \; clear-history
+
+# limit amout of text printed at a time to prevent freeze
+# setw -g c0-change-trigger 10
+# setw -g c0-change-interval 250
+
+### SSH
+
+bind -n M-s command-prompt -p "host" "split-window 'ssh %1'"
+bind -n M-S command-prompt -p "host" "new-window -n %1 'ssh %1'"
+
+###
+
+### emacs
+
+bind-key e new-window -n "emacs"  "emacsclient -nw"
+bind-key E split-window "emacsclient -nw"
+
+###
+
+### status line
+
+set -g status-interval 1
+set -g status-justify left # left align window list
+
+# gpakosz's `_apply_theme` wraps window-status-current-format with leading
+# and trailing #[...]separator markers (lines 794-798 of ~/.tmux.conf), even
+# when the separator chars themselves are empty — that still leaves visible
+# space padding around the current window. tmux 3.4 has no after-source-file
+# hook, so defer our unwrapped format via background run-shell with a tiny
+# sleep that lets `run 'cut -c3- ... _apply_configuration'` (line 166 of
+# ~/.tmux.conf) finish first.
+run -b "sleep 0.5 && tmux set -g window-status-current-format '##I ##W##{?window_zoomed_flag,🔍,}'"

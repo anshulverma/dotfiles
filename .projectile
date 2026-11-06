@@ -1,0 +1,5 @@
+.git/
+*~
+
+# library files
+/tmux/plugins
